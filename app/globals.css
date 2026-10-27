@@ -5,8 +5,9 @@
 @source "../lib/**/*.{ts,tsx}";
 
 @theme {
-  --font-sans: var(--font-geist-sans), system-ui, sans-serif;
-  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --font-display: var(--font-display), "IM Fell English", Georgia, serif;
+  --font-sans: var(--font-sans), "Public Sans", system-ui, sans-serif;
+  --font-mono: var(--font-mono), "Cutive Mono", monospace;
 
   --radius: 2px;
   --radius-sm: 2px;
@@ -14,34 +15,34 @@
 }
 
 /**
- * Design tokens.
- *
- * Every component reads these through `var(--token)` rather than a Tailwind colour class, which is
- * what lets a project change its whole palette from `lib/app-config.ts`: the root layout writes
- * `--accent` inline, overriding the default below. Nothing else needs editing per project.
+ * Design tokens for Archetype AE · Deed.
+ * Ground: #EAE4D3 parchment · Ink: #26231B · Accent: #8C2F39 oxblood stamp.
  */
 :root {
-  --bg-base: #0A0A0A;
-  --bg-surface: #111111;
-  --bg-elevated: #181818;
-  --bg-overlay: #1F1F1F;
-  --border-subtle: #1E1E1E;
-  --border-default: #2A2A2A;
-  --border-strong: #383838;
-  --text-primary: #EBEBEB;
-  --text-secondary: #888888;
-  --text-tertiary: #555555;
-  --accent: #00E5CC;
-  --success: #1DB954;
-  --warning: #F5A623;
-  --danger: #E53E3E;
-  /* Wallet menu: opaque, contrast-checked (scripts/check-ui-contract.py). Redefine per project for ITS ground. */
-  --menu-bg: #181818;
-  --menu-fg: #EBEBEB;
-  --menu-muted: #A8A8A8;
-  --menu-border: #3A3A3A;
-  --menu-hover-bg: #262626;
-  --menu-danger: #FF8A8A;
+  --bg-base: #EAE4D3;
+  --bg-surface: #FBF7EC;
+  --bg-elevated: #F5EFE0;
+  --bg-overlay: #F0E8D5;
+  --border-subtle: #E0D8C0;
+  --border-default: #CFC6AC;
+  --border-strong: #A89F82;
+  --text-primary: #26231B;
+  --text-secondary: #5D574A;
+  --text-muted: #6A634F;
+  --text-tertiary: #8C8472;
+  --accent: #8C2F39;
+  --accent-ink: #FFFFFF;
+  --success: #2E6B3A;
+  --warning: #8A5A00;
+  --danger: #9E1F2B;
+
+  /* Wallet menu tokens (opaque #hex literals for contrast check) */
+  --menu-bg: #FBF7EC;
+  --menu-fg: #26231B;
+  --menu-muted: #5D574A;
+  --menu-border: #CFC6AC;
+  --menu-hover-bg: #EEE6D0;
+  --menu-danger: #9E1F2B;
 }
 
 @layer base {
@@ -69,16 +70,61 @@
   }
 }
 
-/* Touch targets
- *
- * The interface is deliberately dense, and at 26px tall a `size="sm"` button is comfortable with a
- * mouse and a coin-flip with a thumb. `pointer: coarse` matches touch input rather than screen
- * width, so this raises the hit area exactly where it is needed and leaves mouse density
- * untouched, including on a small laptop window.
- *
- * 44px is Apple's minimum; Android asks for 48dp. Padding rather than height, so a control that is
- * already large enough is not stretched.
- */
+/* Deed Sheet & Notarial Framing */
+.deed-sheet {
+  background: var(--bg-surface);
+  border: 4px double var(--border-default);
+  box-shadow: 0 4px 16px rgba(38, 35, 27, 0.08), inset 0 0 40px rgba(207, 198, 172, 0.2);
+  position: relative;
+}
+
+.deed-seal {
+  width: 76px;
+  height: 76px;
+  border-radius: 9999px;
+  border: 2px dashed rgba(255, 255, 255, 0.45);
+  box-shadow: 0 0 0 3px var(--accent), 0 4px 12px rgba(140, 47, 57, 0.35);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #FFFFFF;
+  background: var(--accent);
+  transform: rotate(-4deg);
+}
+
+.deed-seal.seal-lost {
+  background: #8A5A00;
+  box-shadow: 0 0 0 3px #8A5A00, 0 4px 12px rgba(138, 90, 0, 0.35);
+}
+
+.deed-seal.seal-stolen {
+  background: #9E1F2B;
+  box-shadow: 0 0 0 3px #9E1F2B, 0 4px 12px rgba(158, 31, 43, 0.35);
+}
+
+.deed-seal.seal-clear {
+  background: #2E6B3A;
+  box-shadow: 0 0 0 3px #2E6B3A, 0 4px 12px rgba(46, 107, 58, 0.35);
+}
+
+/* Custody Timeline */
+.custody-rule {
+  position: relative;
+}
+
+.custody-rule::before {
+  content: "";
+  position: absolute;
+  top: 10px;
+  bottom: 10px;
+  left: 11px;
+  width: 2px;
+  background: var(--border-default);
+}
+
+/* Touch targets */
 @media (pointer: coarse) {
   button,
   [role="button"],
@@ -90,71 +136,11 @@
 
   input,
   textarea {
-    /* Anything under 16px makes iOS Safari zoom the page on focus, and it does not zoom back. */
     font-size: 16px;
   }
 }
 
-/* Nothing should be able to scroll the page sideways. A single overflowing address or hash
- * otherwise shifts the whole layout and there is no obvious culprit. */
 html,
 body {
   overflow-x: hidden;
-}
-
-::selection {
-  background: color-mix(in srgb, var(--accent) 18%, transparent);
-  color: var(--accent);
-}
-
-::-webkit-scrollbar {
-  width: 4px;
-  height: 4px;
-}
-::-webkit-scrollbar-track {
-  background: var(--bg-base);
-}
-::-webkit-scrollbar-thumb {
-  background: var(--border-strong);
-  border-radius: 2px;
-}
-
-.mono {
-  font-family: var(--font-mono);
-  letter-spacing: 0;
-}
-
-/* Toast entry. Radix drives the data-state; without the keyframes the toast simply appears. */
-@keyframes slideIn {
-  from { transform: translateX(8px); opacity: 0; }
-  to   { transform: translateX(0);   opacity: 1; }
-}
-@keyframes swipeOut {
-  to { transform: translateX(100%); opacity: 0; }
-}
-
-@keyframes shimmer {
-  0%   { background-position: -400px 0; }
-  100% { background-position: 400px 0; }
-}
-.skeleton {
-  background: linear-gradient(
-    90deg,
-    var(--bg-surface) 25%,
-    var(--bg-elevated) 50%,
-    var(--bg-surface) 75%
-  );
-  background-size: 800px 100%;
-  animation: shimmer 1.6s ease-in-out infinite;
-  border-radius: 2px;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
 }
