@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { type Hex } from "viem";
+import { type Hex, parseEventLogs } from "viem";
 import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt, useChainId } from "wagmi";
 import Button from "@/components/ui/Button";
 import BotChainGate from "@/components/botchain/BotChainGate";
@@ -62,12 +62,12 @@ export default function RegisterPage() {
 
   const { writeContract, data: txHash, isPending, error: writeError } = useWriteContract();
 
-  const { isLoading: isWaiting, isSuccess } = useWaitForTransactionReceipt({
+  const { isLoading: isWaiting, isSuccess, data: receipt } = useWaitForTransactionReceipt({
     hash: txHash,
   });
 
   // Check new id after registration success
-  const { data: newIdRaw } = useReadContract({
+  const { data: newIdRaw, refetch: refetchId } = useReadContract({
     address: deployment.address,
     abi: titleAbi,
     functionName: "idOfHash",
@@ -76,11 +76,40 @@ export default function RegisterPage() {
   });
 
   useEffect(() => {
-    if (isSuccess && newIdRaw && Number(newIdRaw) > 0) {
+    if (!isSuccess) return;
+
+    if (receipt) {
+      try {
+        const logs = parseEventLogs({
+          abi: titleAbi,
+          eventName: "Registered",
+          logs: receipt.logs,
+        });
+        if (logs.length > 0 && logs[0].args && "id" in logs[0].args) {
+          const registeredId = Number(logs[0].args.id);
+          if (registeredId > 0) {
+            toast("success", `Title #${registeredId} successfully docketed!`);
+            router.push(`/t/${registeredId}`);
+            return;
+          }
+        }
+      } catch {
+        // Fallback to refetch
+      }
+    }
+
+    if (newIdRaw && Number(newIdRaw) > 0) {
       toast("success", `Title #${String(newIdRaw)} successfully docketed!`);
       router.push(`/t/${String(newIdRaw)}`);
+    } else {
+      refetchId().then((res) => {
+        if (res.data && Number(res.data) > 0) {
+          toast("success", `Title #${String(res.data)} successfully docketed!`);
+          router.push(`/t/${String(res.data)}`);
+        }
+      });
     }
-  }, [isSuccess, newIdRaw, router, toast]);
+  }, [isSuccess, receipt, newIdRaw, refetchId, router, toast]);
 
   const handleDownloadBackup = () => {
     if (!computedHash || !isValidSalt) return;
