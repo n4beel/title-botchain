@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { isAddress, type Address } from "viem";
-import { useAccount, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
+import { useAccount, useWaitForTransactionReceipt } from "wagmi";
+import { useWriteContract } from "@/lib/useChainWrite";
 import Button from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
 import { titleAbi } from "@/lib/botchain/abi";
