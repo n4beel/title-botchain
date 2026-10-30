@@ -9,14 +9,14 @@ import Button from "@/components/ui/Button";
 import DeedCard from "@/components/title/DeedCard";
 import { titleAbi } from "@/lib/botchain/abi";
 import { getDeployment, isDeployed } from "@/lib/botchain/deployment";
-import { type BotChainId, isBotChainId } from "@/lib/botchain/chain";
+import { activeBotChain, isBotChainId, type BotChainId } from "@/lib/botchain/chain";
 import { hashFor, normalizeSerial } from "@/lib/title";
 
 function VerifyContent() {
   const searchParams = useSearchParams();
   const chainId = useChainId();
 
-  const currentChainId: BotChainId = isBotChainId(chainId) ? chainId : 968;
+  const currentChainId: BotChainId = activeBotChain.id;
   const deployment = getDeployment(currentChainId);
   const deployed = isDeployed(currentChainId);
 

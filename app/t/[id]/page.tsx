@@ -10,7 +10,7 @@ import CustodyTimeline from "@/components/title/CustodyTimeline";
 import OwnerControls from "@/components/title/OwnerControls";
 import { titleAbi } from "@/lib/botchain/abi";
 import { getDeployment, isDeployed } from "@/lib/botchain/deployment";
-import { type BotChainId, isBotChainId } from "@/lib/botchain/chain";
+import { activeBotChain, isBotChainId, type BotChainId } from "@/lib/botchain/chain";
 import { type Hop } from "@/lib/title";
 
 export default function TitleDetailPage({
@@ -26,7 +26,7 @@ export default function TitleDetailPage({
   const { address } = useAccount();
   const chainId = useChainId();
 
-  const currentChainId: BotChainId = isBotChainId(chainId) ? chainId : 968;
+  const currentChainId: BotChainId = activeBotChain.id;
   const deployment = getDeployment(currentChainId);
   const deployed = isDeployed(currentChainId);
 

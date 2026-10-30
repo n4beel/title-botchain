@@ -8,7 +8,7 @@ import { useAccount, useReadContract, useChainId } from "wagmi";
 import Button from "@/components/ui/Button";
 import { titleAbi } from "@/lib/botchain/abi";
 import { getDeployment, isDeployed } from "@/lib/botchain/deployment";
-import { type BotChainId, isBotChainId } from "@/lib/botchain/chain";
+import { activeBotChain, isBotChainId, type BotChainId } from "@/lib/botchain/chain";
 import { hashFor, normalizeSerial, flagLabel } from "@/lib/title";
 
 export default function DocketPage() {
@@ -16,7 +16,7 @@ export default function DocketPage() {
   const { address, isConnected } = useAccount();
   const chainId = useChainId();
 
-  const currentChainId: BotChainId = isBotChainId(chainId) ? chainId : 968;
+  const currentChainId: BotChainId = activeBotChain.id;
   const deployment = getDeployment(currentChainId);
   const deployed = isDeployed(currentChainId);
 
